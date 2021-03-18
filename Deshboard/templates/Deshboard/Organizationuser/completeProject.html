@@ -1,0 +1,279 @@
+{% extends "./organization.html" %}
+{% load static %}
+{% load humanize  %}
+
+{% block projectopen %}
+menu-open
+{% endblock projectopen %}
+
+{% block showCompleteProjectActive %}
+active
+{% endblock showCompleteProjectActive %}
+
+{% block projectactive %}
+active
+{% endblock projectactive %}
+
+{% block style %}
+{% if complete_project %}
+      <!-- DataTables -->
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+
+      <style>
+
+
+
+        .starrating > input {display: none;}  /* Remove radio buttons */
+        
+        .starrating > label:before { 
+          content: "\f005"; /* Star */
+          margin: 2px;
+          /* font-size: 2em; */
+          font-family: FontAwesome;
+          display: inline-block; 
+        }
+        
+        .starrating > label
+        {
+          color: #222222; /* Start color when not clicked */
+        }
+        
+        .starrating > input:checked ~ label
+        { color: #ffca08 ; } /* Set yellow color when star checked */
+        
+        .starrating > input:hover ~ label
+        { color: #ffca08 ;  } /* Set yellow color when star hover */
+        
+        
+              </style>
+{% endif %}
+{% endblock style %}
+
+{% block script %}
+{% if complete_project %}
+
+<!-- DataTables  & Plugins -->
+<script src="{% static 'Deshboard/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script type="text/javascript">
+
+
+$(document).ready(function() {
+
+
+    $(".completeshowMYClass").click(function() {
+      $("#complete_description_show").attr("readonly", true);
+            var pid = $(this).val();
+            $("#ProjectName-complete-show").text($("#Main-Project-Name"+pid).text());
+
+            $.ajax({
+            url:"{% url 'completeProjectShow' 1 %}".replace('/1',"/"+pid),
+            type:'GET',
+        })
+        .done(function(response){
+            var json_response =JSON.parse(response)
+            $("#complete_description_show").text(json_response['complete_description']);
+            var rating =json_response['complete_Rating']
+            $("#star5_show").attr("disabled",true)
+            $("#star4_show").attr("disabled",true)
+            $("#star3_show").attr("disabled",true)
+            $("#star2_show").attr("disabled",true)
+            $("#star1_show").attr("disabled",true)
+            if(rating == 5.0)
+            { 
+                $("#star5_show").attr("checked","checked")
+            }
+            else if(rating == 4.0)
+            {
+                $("#star4_show").attr("checked","checked")  
+            }
+            else if(rating == 3.0)
+            {
+                $("#star3_show").attr("checked","checked")  
+            }
+            else if(rating == 2.0)
+            {
+                $("#star2_show").attr("checked","checked")  
+            }
+            else if(rating == 1.0)
+            {
+                $("#star1_show").attr("checked","checked")
+            }
+        })
+        .fail(function(response){
+            console.log(response);
+        })
+
+        })
+    
+
+
+    // function For DataTable
+    $('#project-table').DataTable({
+      // "scrollX": true,
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "responsive": true,
+      "scrollY": true,
+    });
+
+});
+</script>
+{% endif %}
+{% endblock script %}
+
+{% block body %}
+  
+<div class="container-fluid">
+
+  {% if complete_project %}
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Projects</h3>
+  
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-3">
+            <table id="project-table" class="table table-striped projects">
+                <thead>
+                    <tr>
+                        <th style="width: 1%">
+                            #
+                        </th>
+                        <th style="width: 15%">
+                            Project Name
+                        </th>
+                        <th style="width: 30%">
+                            Project Progress
+                        </th>
+                        <th style="width: 10%">
+                            Assigned By
+                        </th>
+                        <th style="width: 8%" class="text-center">
+                            Status
+                        </th>
+                        <th style="width: 20%">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody> 
+                    {% for project in complete_project %}
+                    <tr>
+                        <td>
+                            {{forloop.counter}}
+                        </td>
+                        <td>
+                            <a id="Main-Project-Name{{project.id}}">
+                                {{project.project_name|truncatechars:20}}
+                            </a>
+                            <br/>
+                            <small>
+                                Updated {{project.updated_at|naturaltime}}
+                            </small>
+                        </td>
+                        <td class="project_progress">
+                            <div class="progress progress-sm">
+                                <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{project.project_progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{project.project_progress}}%">
+                                </div>
+                            </div>
+                            <small>
+                              {{project.project_progress}}% Complete
+                            </small>
+                        </td>
+                        <td class="project_progress">
+                            <a>{{project.assigned_by|truncatechars:20}}</a>
+                        </td>
+                        <td class="project-state">
+                            {% if project.status == 'completed' %}
+                            <span class="badge badge-success">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td class="project-actions text-right">
+                            <button type="button" data-toggle="modal" data-target="#Project-Complete-show-model" class="btn btn-primary btn-sm completeshowMYClass" value="{{project.id}}">
+                                <i class="fas fa-folder">
+                                </i>
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+  
+      </section>
+
+
+      <div class="modal fade" id="Project-Complete-show-model">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title col-11 text-center" id="ProjectName-complete-show">None</h4>
+            </div>
+            <div class="modal-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="card card-primary">
+                        <div class="card-header">
+                          <h3 class="card-title">Complete Project</h3>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="form-group">
+                              <label for="complete_description_show">Complete Description</label>
+                              <textarea id="complete_description_show" name="complete_description_show" class="form-control" rows="4" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="complete_Rating_show">Complete Rating</label><br>
+                                <div class="starrating risingstar d-flex float-left flex-row-reverse">
+                                    <input type="radio" id="star5_show" name="rating" value="5" /><label for="star5_show" title="5 star">5</label>
+                                    <input type="radio" id="star4_show" name="rating" value="4" /><label for="star4_show" title="4 star">4</label>
+                                    <input type="radio" id="star3_show" name="rating" value="3" /><label for="star3_show" title="3 star">3</label>
+                                    <input type="radio" id="star2_show" name="rating" value="2" /><label for="star2_show" title="2 star">2</label>
+                                    <input type="radio" id="star1_show" name="rating" value="1" /><label for="star1_show" title="1 star">1</label>
+                                </div>
+                                </div>
+                        </div>
+                            	
+                    
+                   
+                        <!-- /.card-body -->
+                      </div>
+                      <!-- /.card -->
+                    </div>
+                  </div>
+                  <div id="error-display"></div>
+                
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+  {% else %}
+  <p>No project found</p>
+  {% endif %}
+
+</div>
+{% endblock body %}

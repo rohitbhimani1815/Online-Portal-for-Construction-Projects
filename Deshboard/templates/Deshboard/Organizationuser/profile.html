@@ -1,0 +1,325 @@
+{% extends './organization.html' %}
+
+{% block script %}
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+  $("#Past-Project-form").submit(function(e){
+    e.preventDefault();
+    $.ajax({
+      url:"{% url 'addPastProjects' %}",
+      type:'POST',
+      data: $(this).serialize(),
+      context: this,
+    })
+    .done(function(response){
+      var json_response =JSON.parse(response)
+      if (json_response == "You are not authorized to view this page"){
+            $('#id-model-main-row-Edit').html("<p>You are not authorized to view this page</p>")
+          }
+      else if(json_response == "Error"){
+        $('#id-model-main-row-Edit').html("<p>There is a Error To Add Past Project. Please Check Details</p>")
+      }
+          else{
+            location.reload();
+          }
+    })
+    .fail(function(){
+      $('#id-model-main-row-Edit').html("<p>There is a Error To Add Past Project. Please try again Later.</p>")
+    })
+  });
+
+
+})
+
+</script>
+
+{% endblock script %}
+
+{% block body %}
+
+<div class="container-fluid">
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3">
+
+            <!-- Profile Image -->
+            <div class="card card-primary card-outline">
+              <div class="card-body box-profile">
+                <div class="text-center">
+                  <img class="profile-user-img img-fluid img-circle"
+                       src="{{request.user.organizationuserprofile.profile_pic.url}}"
+                       alt="User profile picture">
+                </div>
+
+                <h3 class="profile-username text-center">{{request.user.get_username}}</h3>
+
+                <p class="text-muted text-center">{{request.user.organizationuserprofile.organization_name}}</p>
+
+                <ul class="list-group list-group-unbordered mb-3">
+                  <li class="list-group-item">
+                    <b>Name :</b> <a class="float-right">{{request.user.get_full_name}}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Email :</b> <a  href="mailto:{{request.user.email}}" target="_blank" class="float-right">{{request.user.email}}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Date Join :</b> <a class="float-right">{{request.user.date_joined}}</a>
+                  </li>
+                </ul>
+
+                
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+            <!-- About Me Box -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">About Me</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <strong><i class="fas fa-book mr-1"></i> Total Project</strong>
+
+                <p class="text-muted">
+                  {{request.user.organizationuserprofile.total_project}}
+                </p>
+
+                <hr>
+
+                <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
+
+                <p class="text-muted">{{request.user.organizationuserprofile.location}}</p>
+
+                <hr>
+
+                <strong><i class="fas fa-pencil-alt mr-1"></i>Phone Number</strong>
+
+                <p class="text-muted">
+                  {{request.user.organizationuserprofile.phone}}
+                </p>
+
+                
+                <strong><i class="far fa-file-alt mr-1"></i> Experience</strong>
+
+                <p class="text-muted">{{request.user.organizationuserprofile.experiance}}</p>
+
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-9">
+            <div class="card">
+              <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                  <li class="nav-item"><a class="nav-link active" href="#pastProjectTab" data-toggle="tab">Past Project</a></li>
+                  
+                  <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li>
+                </ul>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+                <div class="tab-content">
+                  <div class="active tab-pane" id="pastProjectTab">
+
+
+                    <div class="card-body">
+                      <div class='mb-3'>
+                      <button type="button" id="AddpastProject-btn" class="btn btn-success" data-toggle="modal" data-target="#Past-Project-Add">
+                        Add Project
+                      </button>
+                    </div>
+                      <div id="accordion">
+                        {% for item in past_project %}
+                        <div class="card card-primary">
+                          <div class="card-header">
+                            <h4 class="card-title w-100">
+                              <a class="d-block w-100" data-toggle="collapse" href="#projectid{{item.id}}">
+                                <div>
+                                  <div>
+                                    <b>Projct Name</b> :
+                                    {{item.project_name}} 
+                                  </div>
+                                </div>
+                              </a>
+                            </h4>
+                          </div>
+                          <div id="projectid{{item.id}}" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                              <div>
+                                <div>
+                                  <b>Projct Description</b> :
+                                  {{item.project_description}} 
+                                </div>
+                                <div>
+                                  <b>Estimated Budget</b> :
+                                  {{item.estimated_budget}} 
+                                </div>
+                                <div>
+                                  <b>Estimated Project Duration</b> :
+                                  {{item.estimated_project_duration}} 
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  
+                  </div>
+                  
+                  <!-- /.tab-pane -->
+                  <div class="tab-pane" id="settings">
+                    {% include "../message.html" %}
+                    <form class="form-horizontal" method="POST" enctype="multipart/form-data">{% csrf_token %}
+                      <div class="form-group row">
+                        <label for="id_first_name" class="col-sm-2 col-form-label">First Name</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="first_name" id="id_first_name" value="{{form.first_name.value}}" placeholder="First Name" required>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_last_name" class="col-sm-2 col-form-label">Last Name</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="last_name" id="id_last_name" value="{{form.last_name.value}}" placeholder="Last Name" required>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_username" class="col-sm-2 col-form-label">User Name</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="username" id="id_username" value="{{form.username.value}}" placeholder="User Name" autofocus required>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_organization_id" class="col-sm-2 col-form-label">Organization id</label>
+                        <div class="col-sm-10">
+                          <input type="number" class="form-control" name="organization_id" id="id_organization_id" value="{{profileForm.organization_id.value}}" placeholder="Organization id" required="">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_organization_name" class="col-sm-2 col-form-label">Organization Name</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="organization_name" id="id_organization_name" value="{{profileForm.organization_name.value}}" maxlength="200" placeholder="Organization Name" required="">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_location" class="col-sm-2 col-form-label">Location</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="location" id="id_location" value="{{profileForm.location.value}}" placeholder="Location">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_email" class="col-sm-2 col-form-label">Email</label>
+                        <div class="col-sm-10">
+                          <input type="email" class="form-control" name="email" id="id_email" value="{{form.email.value}}" placeholder="Email" required >
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_phone" class="col-sm-2 col-form-label">Contact number</label>
+                        <div class="col-sm-10">
+                          <input type="tel" id="id_phone" maxlength="128" name="phone" class="form-control" value="{{profileForm.phone.value}}" placeholder="Contact Number" required>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_experiance" class="col-sm-2 col-form-label">Experience</label>
+                        <div class="col-sm-10">
+                          <textarea class="form-control" name="experiance" id="id_experiance" placeholder="Experience">{{profileForm.experiance.value}}</textarea>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_profile_pic" class="col-sm-2 col-form-label">Profile pic:</label>
+                        <div class="col-sm-10">
+                          {{profileForm.profile_pic}}
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="offset-sm-2 col-sm-10">
+                          <button type="submit" class="btn btn-danger">Submit</button>
+                        </div>
+                      </div>
+                      {% include "../error.html" %}
+                    </form>
+                  </div>
+                  <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+              </div><!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+
+    
+    <div class="modal fade" id="Past-Project-Add">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title col-11 text-center" id="ProjectNameEdit">Past Project</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <section class="content" id="id-model-main-row-Edit">
+                  <form method="post" id="Past-Project-form" class="form-validate">{% csrf_token %}
+                  <div class="row" id="pastProjectForm">
+                        
+                        <div class="card-body">
+                          <div class="form-group">
+                            <label for="id_project_name">Project Name</label>
+                            <input type="text" name="project_name" id="id_project_name" class="form-control" required>
+                          </div>
+                          <div class="form-group">
+                            <label for="id_project_description">Project Description</label>
+                            <textarea id="id_project_description" name="project_description" class="form-control" rows="4" required></textarea>
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEstimatedBudget">Estimated budget</label>
+                            <input type="text" name="estimated_budget" maxlength="30" id="id_estimated_budget" required class="form-control">
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEstimatedDuration">Estimated project duration</label>
+                            <input type="text" name="estimated_project_duration" maxlength="15" id="id_estimated_project_duration" required class="form-control">
+                          </div>
+                    
+                        </div>
+                        <!-- /.card-body -->
+                      <!-- /.card -->
+                    
+                  </div>
+                  <div class="row">
+                    <div class="col-7 mb-3">
+                      <button type="submit" id="Add-Porject-btn" class="btn btn-success float-right">
+                        Add Porject
+                      </button>
+                    </div>
+                  </div>
+                </form>
+                </section>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <!-- /.content -->
+
+</div>
+
+{% endblock %}

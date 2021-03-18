@@ -1,0 +1,86 @@
+{% extends "./superuser.html" %}
+
+{% block OrUserActive %}
+active
+{% endblock %}
+
+{% block createuseropen %}
+menu-open
+{% endblock createuseropen %}
+
+{% block createuseractive %}
+active
+{% endblock createuseractive %}
+
+{% block body %}
+  
+<div class="container-fluid">
+{% include "../message.html" %}
+    <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="card-title">Organization User</h3>
+        </div>
+        <!-- /.card-header -->
+        <!-- form start -->
+        <form method="post" class="form-validate">{% csrf_token %}
+          <div class="card-body">
+            <div class="row">
+              <div class="form-group col">
+                <label for="id_first_name">First name</label>
+                <input type="text" class="form-control" id="id_first_name" name="first_name" placeholder="First name" required>
+              </div>
+              <div class="form-group col">
+                <label for="id_last_name">Last name</label>
+                <input type="text" class="form-control" id="id_last_name" name="last_name" placeholder="Last name" required>
+              </div>
+            </div>
+            <div class="row">
+            <div class="form-group col">
+                <label for="id_username">User name</label>
+                <input type="text" class="form-control" id="id_username" name="username" placeholder="User name" autofocus required>
+            </div>
+            <div class="form-group col">
+              <label for="exampleInputEmail1">Email address</label>
+              <input type="email" class="form-control" id="id_email" name="email" placeholder="Enter email" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col">
+                <label for="id_organization_name">Organization name</label>
+                <input type="text" class="form-control" id="id_organization_name" maxlength="200" name="organization_name" placeholder="Organization name" required>
+            </div>
+            <div class="form-group col">
+                <label for="id_organization_id">Organization id</label>
+                <input type="number" class="form-control" id="id_organization_id" name="organization_id" placeholder="Organization id" required>
+            </div>
+          </div>
+            <div class="form-group">
+                <label>Contact number</label>
+
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                  </div>
+                  <input type="tel" id="id_phone" maxlength="128" name="phone" class="form-control" placeholder="Contact Number" required>
+                </div>
+              </div>
+            <div class="form-group">
+              <label for="id_password1">Password</label>
+              <input type="password" class="form-control" id="id_password1" name="password1" placeholder="Password" required>
+            </div>
+            <div class="form-group">
+              <label for="id_password2">Conform Password</label>
+              <input type="password" class="form-control" id="id_password2" name="password2" placeholder="Conform Password" required>
+            </div>
+          </div>
+          <!-- /.card-body -->
+
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+          {% include "../error.html" %}
+        </form>
+      </div>
+</div><!-- /.container-fluid -->
+
+{% endblock body %}

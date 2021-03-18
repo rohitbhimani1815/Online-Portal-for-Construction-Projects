@@ -1,0 +1,291 @@
+{% extends "./government.html" %}
+{% load static %}
+{% load humanize  %}
+
+{% block projectopen %}
+menu-open
+{% endblock projectopen %}
+
+{% block ShowProjectActive %}
+active
+{% endblock ShowProjectActive %}
+
+{% block projectactive %}
+active
+{% endblock projectactive %}
+
+{% block style %}
+
+      <!-- DataTables -->
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+
+{% endblock style %}
+
+{% block script %}
+
+
+<!-- DataTables  & Plugins -->
+<script src="{% static 'Deshboard/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+  // function for View Project
+    $(".viewMYClass").click(function() {
+        var pid =  $(this).val();
+
+        $.ajax({
+
+            url:"{% url 'ShowProjectDetail' 1 %}".replace('/1',"/"+pid),
+            type:'GET',
+        })
+        .done(function(response){
+          if (response == "You are not authorized to view this page"){
+
+            $('#id-model-main-row').html("<p>You are not authorized to view this page</p>")
+          }
+          else{
+            var json_data=JSON.parse(response)[0];
+            $("#ProjectName").text("Project "+json_data['project_name'])
+            $("#Estimatedbudget").text(json_data['estimated_budget'])
+            $("#project-status").text(json_data['status'])
+            $("#Estimated-project-duration").text(json_data['estimated_project_duration'])
+            $("#project-Details").text(json_data['project_description'])
+            if(json_data['assigned_by']== null){
+
+                $("#Assigne-By").text("Project Not Assigne");
+            }
+            else{
+
+                $("#Assigne-By").text(json_data['assigned_by']);
+            }
+            if(json_data['assigned_to']== null){
+
+                $("#Project-Assigne-To").text("Project Not Assigne");
+            }
+            else{
+
+                $("#Project-Assigne-To").text(json_data['assigned_to']);
+            }
+            $("#Project-Apply-Start-Date").text(json_data['apply_start_date'])
+            $("#Project-Apply-End-Date").text(json_data['apply_end_date'])
+            $("#project-forms").text(json_data['Forms'])
+            $("#Project-Created-Date").text(json_data['created_at'])
+            $("#Project-Updated-Date").text(json_data['updated_at'])
+
+        }
+      })
+        .fail(function(){
+            $('#id-model-main-row').html("<p>There is a Error For Loading Project. Please try again Later.</p>")
+        })
+    });
+
+    // function For DataTable
+    $('#project-table').DataTable({
+      "scrollX": true,
+      "paging": true,
+      // "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      // "responsive": true,
+      "scrollY": true,
+    });
+})
+
+</script>
+
+{% endblock script %}
+
+{% block body %}
+  
+<div class="container-fluid">
+
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="card">
+          {% include "../message.html" %}
+          <div class="card-header">
+            <h3 class="card-title">Projects</h3>
+  
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-3">
+            <table id="project-table" class="table table-striped projects">
+                <thead>
+                    <tr>
+                        <th style="width: 1%">
+                            #
+                        </th>
+                        <th style="width: 15%">
+                            Project Name
+                        </th>
+                        <th style="width: 30%">
+                            Project Description
+                        </th>
+                        <th style="width: 10%">
+                            Assigned By
+                        </th>
+                        <th style="width: 10%">
+                            Assigned To
+                        </th>
+                        <th style="width: 8%" class="text-center">
+                            Status
+                        </th>
+                        <th style="width: 20%">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in all_projects %}
+                    <tr>
+                        <td>
+                            {{forloop.counter}}
+                        </td>
+                        <td>
+                            <a id="Main-Project-Name{{project.id}}">
+                                {{project.project_name|truncatechars:20}}
+                            </a>
+                            <br/>
+                            <small>
+                                Updated {{project.updated_at|naturaltime}}
+                            </small>
+                        </td>
+                        <td>
+                            <a>
+                                {{project.project_description|truncatechars:75}}
+                            </a>
+                        </td>
+                        <td class="project_progress">
+                            <a>{{project.assigned_by|truncatechars:20}}</a>
+                        </td>
+                        <td>
+                            <a>
+                                {{project.assigned_to|truncatechars:20}}
+                            </a>
+                        </td>
+                        <td class="project-state">
+                            {% if project.status == 'pending' %}
+                            <span class="badge badge-warning">Pending</span>
+                            {% elif project.status == 'assigned' %}
+                            <span class="badge badge-primary">Assigned</span>
+                            {% elif project.status == 'completed' %}
+                            <span class="badge badge-success">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td class="project-actions text-right">
+                            <button type="button" data-toggle="modal" data-target="#Project-detail-show-model" class="btn btn-primary btn-sm viewMYClass" value="{{project.id}}">
+                                <i class="fas fa-folder">
+                                </i>
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+  
+      </section>
+  
+      <div class="modal fade" id="Project-detail-show-model">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title col-11 text-center" id="ProjectName">None</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="id-model-main-row">
+                    <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
+                      <div class="row">
+                        <div class="col-12 col-sm-4">
+                          <div class="info-box bg-light">
+                            <div class="info-box-content">
+                              <span class="info-box-text text-center text-muted">Estimated budget</span>
+                              <span class="info-box-number text-center text-muted mb-0" id="Estimatedbudget" >000</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                          <div class="info-box bg-light">
+                            <div class="info-box-content">
+                              <span class="info-box-text text-center text-muted">Project Status</span>
+                              <span class="info-box-number text-center text-muted mb-0" id="project-status">None</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                          <div class="info-box bg-light">
+                            <div class="info-box-content">
+                              <span class="info-box-text text-center text-muted">Estimated project duration</span>
+                              <span class="info-box-number text-center text-muted mb-0" id="Estimated-project-duration">000</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div>
+                        <h3 class="text-primary d-block">Project Details</h3>
+                        <p class="text-muted" id="project-Details">None</p>
+                        <h3 class="text-primary d-block">Project Assigne By</h3>
+                        <p class="text-muted" id="Assigne-By">None</p>
+                        <h3 class="text-primary d-block">Project Assigne To</h3>
+                        <p class="text-muted" id="Project-Assigne-To">None</p>
+                    </div>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
+                        <div class="text-muted">
+                        <h6 class="text-sm">Project Forms</h6>
+                        <b  id="project-forms">None</b>
+                    </div>
+                        <br>
+                        <div class="text-muted">
+                            <p class="text-sm">Project Apply Start Date
+                              <b class="d-block" id="Project-Apply-Start-Date">None</b>
+                            </p>
+                            <p class="text-sm">Project Apply End Date
+                              <b class="d-block" id="Project-Apply-End-Date">None</b>
+                            </p>
+                          </div>
+                        <div class="text-muted">
+                            <p class="text-sm">Project Created Date
+                              <b class="d-block" id="Project-Created-Date">None</b>
+                            </p>
+                            <p class="text-sm">Project Updated Date
+                              <b class="d-block" id="Project-Updated-Date">None</b>
+                            </p>
+                          </div>
+                      </div>
+                  </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+
+</div>
+
+{% endblock %}

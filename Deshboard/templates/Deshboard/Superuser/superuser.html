@@ -1,0 +1,185 @@
+{% extends "../basic.html" %}
+
+{% block title %}
+<title>SuperUser | Dashboard</title>
+{% endblock  %}
+
+{% block userhome %}
+{% url 'SuHome' %}
+{% endblock %}
+
+{% block profile_url %}
+{% url 'suprofile' %}
+{% endblock profile_url %}
+
+{% block profile_pic %}
+{{request.user.superuserprofile.profile_pic.url}}
+{% endblock %}
+
+{% block loginname %}
+{{request.user.username}}
+{% endblock %}
+
+{% block sidebar %}
+
+<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+    <!-- Add icons to the links using the .nav-icon class
+         with font-awesome or any other icon font library -->
+
+        <!-- home nav -->
+        <li class="nav-item">
+          <a href="{% url 'SuHome' %}" class="nav-link {% block HomeActive %}{% endblock %}">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p>
+              Home
+            </p>
+          </a>
+        </li>
+
+        <!-- Create User -->
+
+        <li class="nav-item {% block createuseropen %}{% endblock createuseropen %}">
+          <a href="#" class="nav-link {% block createuseractive %}{% endblock createuseractive %}">
+            
+            <i class="nav-icon fas fa-user-plus"></i>
+            <p>
+              Create User
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'createGovUser' %}" class="nav-link {% block GovUserActive %}{% endblock %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Goverment User</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'CreateOrUser' %}" class="nav-link {% block OrUserActive %}{% endblock %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Organization User</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Projects -->
+        <li class="nav-item {% block projectopen %}{% endblock projectopen %}">
+          <a href="#" class="nav-link {% block projectactive %}{% endblock projectactive %}">
+            <i class="nav-icon fas fa-edit"></i>
+            <p>
+              Project
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'CreateProject' %}" class="nav-link {% block CreateProjectActive %}{% endblock CreateProjectActive %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Create Project</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'ShowProject' %}" class="nav-link {% block ShowProjectActive %}{% endblock ShowProjectActive %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Show Project</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'CreateForm' %}" target="_blank" class="nav-link {% block CreateFormActive %}{% endblock CreateFormActive %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Create Form</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'ShowformList' %}" class="nav-link {% block ShowFormActive %}{% endblock ShowFormActive %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Show Form</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- applied projects -->
+        <li class="nav-item {% block appliedprojectopen %}{% endblock appliedprojectopen %}">
+          <a href="#" class="nav-link {% block appliedprojectactive %}{% endblock appliedprojectactive %}">
+            <i class="nav-icon fas fa-tasks"></i>
+            <p>
+              Applied Project
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'appliedProjectList' %}" class="nav-link {% block ApplideProjectListActive %}{% endblock %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Applied Project Show</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'trackProject' %}" class="nav-link {% block TrackProjectActive %}{% endblock %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Track Project</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'completeProject' %}" class="nav-link {% block complateProjectActive %}{% endblock complateProjectActive %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Complete Project</p>
+              </a>
+            </li>
+
+          </ul>
+        </li>
+
+        <!-- Manage User -->
+        <li class="nav-item {% block ManageUseropen %}{% endblock ManageUseropen %}">
+          <a href="#" class="nav-link {% block ManageUseractive %}{% endblock ManageUseractive %}">
+            <i class="nav-icon fas fa-user-check"></i>
+            <p>
+              Manage User
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'manageGovUser' %}" class="nav-link {% block ManageGovUserActive %}{% endblock ManageGovUserActive %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Goverment User</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'manageOrUser' %}" class="nav-link {% block ManageOrUserActive %}{% endblock ManageOrUserActive %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Organization User</p>
+              </a>
+            </li>
+          </ul>
+        </li> 
+
+  </ul>
+
+{% endblock %}
+
+{% block ContentHeader %}
+
+<div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Dashboard</h1>
+        </div><!-- /.col -->
+        <!-- <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active">Dashboard v1</li>
+          </ol>
+        </div> -->
+        <!-- /.col -->
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+
+
+{% endblock %}
+

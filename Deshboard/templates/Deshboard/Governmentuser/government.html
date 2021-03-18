@@ -1,0 +1,122 @@
+{% extends "../basic.html" %}
+
+{% block title %}
+<title>Goverment User | Dashboard</title>
+{% endblock  %}
+
+{% block userhome %}
+{% url 'GoHome' %}
+{% endblock %}
+
+{% block profile_url %}
+{% url 'goprofile' %}
+{% endblock profile_url %}
+
+
+{% block profile_pic %}
+{{request.user.govermentuserprofile.profile_pic.url}}
+{% endblock %}
+
+{% block loginname %}
+{{request.user.username}}
+{% endblock %}
+
+{% block sidebar %}
+
+<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+
+        <!-- home nav -->
+        <li class="nav-item">
+          <a href="{% url 'GoHome' %}" class="nav-link {% block HomeActive %}{% endblock %}">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p>
+              Home
+            </p>
+          </a>
+        </li>
+
+        <!-- Projects -->
+        <li class="nav-item {% block projectopen %}{% endblock projectopen %}">
+          <a href="#" class="nav-link {% block projectactive %}{% endblock projectactive %}">
+            <i class="nav-icon fas fa-edit"></i>
+            <p>
+              Project
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'ShowProject' %}" class="nav-link {% block ShowProjectActive %}{% endblock ShowProjectActive %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Show Project</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'ShowformList' %}" class="nav-link {% block ShowFormActive %}{% endblock ShowFormActive %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Show Form</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- applied projects -->
+        <li class="nav-item {% block appliedprojectopen %}{% endblock appliedprojectopen %}">
+          <a href="#" class="nav-link {% block appliedprojectactive %}{% endblock appliedprojectactive %}">
+            <i class="nav-icon fas fa-tasks"></i>
+            <p>
+              Applied Project
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{% url 'appliedProjectList' %}" class="nav-link {% block ApplideProjectListActive %}{% endblock %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Applied Project Show</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'trackProject' %}" class="nav-link {% block TrackProjectActive %}{% endblock %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Track Project</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{% url 'completeProject' %}" class="nav-link {% block complateProjectActive %}{% endblock complateProjectActive %}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Complete Project</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Show Organization -->
+        <li class="nav-item">
+          <a href="{% url 'manageOrUser' %}" class="nav-link {% block ManageOrUserActive %}{% endblock ManageOrUserActive %}">
+            <i class="far fa-user nav-icon"></i>
+            <p>Show Organization</p>
+          </a>
+        </li>
+
+
+  </ul>
+
+{% endblock %}
+
+{% block ContentHeader %}
+
+<div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Dashboard</h1>
+        </div><!-- /.col -->
+        
+      </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+  </div>
+
+
+{% endblock %}
+

@@ -1,0 +1,174 @@
+{% extends "./organization.html" %}
+{% load static %}
+{% load humanize  %}
+
+
+{% block appliedprojectactive %}
+active
+{% endblock appliedprojectactive %}
+
+{% block appliedprojectopen %}
+menu-open
+{% endblock appliedprojectopen %}
+
+{% block ApplideProjectListActive %}
+active
+{% endblock ApplideProjectListActive %}
+
+{% block style %}
+
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'Deshboard/plugins/select2/css/select2.min.css' %}">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'Deshboard/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+
+      <!-- DataTables -->
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+
+{% endblock style %}
+
+
+
+{% block script %}
+
+
+<!-- DataTables  & Plugins -->
+<script src="{% static 'Deshboard/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Select2 -->
+<script src="{% static 'Deshboard/plugins/select2/js/select2.full.min.js' %}"></script>
+
+<!-- moment.js -->
+<script src="{% static 'Deshboard/plugins/moment/moment.min.js' %}"></script>
+
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="{% static 'Deshboard/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+    $('.project-table').DataTable({
+      "scrollX": true,
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": true,
+    //   "responsive": true,
+      "scrollY": true,
+    });
+
+} );
+
+    
+    </script>
+
+{% endblock script %}
+
+{% block body %}
+  
+<div class="container-fluid">
+{% for form in form_data %}
+
+
+<section id="" class="content">
+    <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+              <div>
+                  <div class="row">Form Name :  {{form.0.form_name}}</div>
+              </div>
+          </h3>
+  
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+              <i class="fas fa-minus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-3">
+          <table id="project-table" class="table table-striped project-table">
+              <thead>
+                  <tr>
+                      <th style="width: 2%">
+                          #
+                      </th>
+                      <th style="">
+                          Apply user
+                      </th>
+                      <th style="">
+                          Apply Date
+                      </th>
+                      {% for col_name in form.0.submited_data  %}
+                      <th style="">
+                          {{col_name}}
+                    </th>
+                      {% endfor %}
+                      {% for col_name in form.0.submited_File  %}
+                      <th style="">
+                          {{col_name}}
+                    </th>
+                      {% endfor %}
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for data in form %}
+            
+                  <tr>
+                      <td>
+                          {{forloop.counter}}
+                      </td>
+                      <td>
+                              {{data.user}} 
+                        </td>
+                        <td>
+                            {{data.submited_at}}
+                        </td>
+                      {% for _,col_data in data.submited_data.items %}
+                      <td class="project-actions">
+                          {{col_data}}
+                      </td>
+                      {% endfor %}
+                      {% for _,col_data in data.submited_File.items %}
+                      <td class="project-actions">
+                          <a href="{{col_data.1}}" target="_blank">{{col_data.0}}</a>
+                      </td>
+                      {% endfor %}
+                  </tr>
+                  {% endfor %}   
+              </tbody>
+              <tfoot>
+                  <tr>
+                      <th style="width: 1%">
+                          #
+                      </th>
+                      <th style="width: 30%">
+                        Apply user
+                      </th>
+                      <th style="">
+                        Apply Date
+                    </th>
+                      {% for col_name in form.0.submited_data  %}
+                      <th style="">
+                          {{col_name}}
+                    </th>
+                      {% endfor %}
+                  </tr>
+              </tfoot>
+          </table>
+        </div>
+        <!-- /.card-body -->
+      </div>
+  </section>
+
+
+{% endfor %}
+</div><!-- /.container-fluid -->
+
+{% endblock body %}

@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>  
+    <link href="{% static 'Deshboard/css/bootstrap.min.css' %}" rel="stylesheet">
+ 
+    <link href="{% static 'Deshboard/css/bootstrap-responsive.min.css' %}" rel="stylesheet">
+    <link href="{% static 'Deshboard/css/custom.css' %}"  rel="stylesheet">
+
+</head>
+<body>
+
+     {% if fillform %}
+      <div class="container">
+          {{form | safe}}
+        </div>
+    
+        
+    <script>
+
+        let myform=document.getElementsByTagName("form");
+        var x = document.createElement("INPUT");
+        x.setAttribute("type", "submit");
+        x.setAttribute("value", "submit");
+        myform[0].appendChild(x);
+        myform[0].action="";
+        myform[0].method="POST";
+    </script>
+    {% else %}
+    <div class="container">
+        <p>You Already Fill This Form </p>
+    </div>
+    {% endif %}
+</body>
+</html>

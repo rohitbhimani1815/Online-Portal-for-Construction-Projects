@@ -1,0 +1,258 @@
+{% extends "./organization.html" %}
+{% load static %}
+{% load humanize  %}
+
+{% block projectopen %}
+menu-open
+{% endblock projectopen %}
+
+{% block showCurrentProjectActive %}
+active
+{% endblock showCurrentProjectActive %}
+
+{% block projectactive %}
+active
+{% endblock projectactive %}
+
+{% block style %}
+{% if current_Project %}
+      <!-- DataTables -->
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+{% endif %}
+{% endblock style %}
+
+{% block script %}
+{% if current_Project %}
+
+<!-- DataTables  & Plugins -->
+<script src="{% static 'Deshboard/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script type="text/javascript">
+
+
+$(document).ready(function() {
+
+    $(".showMYClass").click(function() {
+            var pid = $(this).val();
+            $("#ProjectName-show").text($("#Main-Project-Name"+pid).text());
+
+            $.ajax({
+            url:"{% url 'trackProjectShow' 1 %}".replace('/1',"/"+pid),
+            type:'GET',
+        })
+        .done(function(response){
+            var json_response =JSON.parse(response)
+            var table_str=``;
+            var counter = 0;
+            for(data in json_response){
+                counter += 1;
+
+                table_str += `
+                                <tr>
+                                  <td>
+                                      `+counter+`
+                                  </td>
+                                  <td>
+                                      <a>
+                                          `+json_response[data].track_status+`
+                                      </a>
+                                  </td>
+                                  <td class="">
+                                      <a>`+json_response[data].track_description+`</a>
+                                  </td>
+                                  <td class="">
+                                    <a>`+json_response[data].project_progress+`%</a>
+                                  </td>
+                                  <td>
+                                    `+json_response[data].created_at+`
+                                 </td>
+                              </tr>
+                `
+
+            }
+            $("#project-track-table-id").html(table_str)
+        })
+        .fail(function(response){
+            console.log(response);
+        })
+
+        })
+
+
+    // function For DataTable
+    $('#project-table').DataTable({
+      // "scrollX": true,
+      "paging": true,
+      "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "responsive": true,
+      "scrollY": true,
+    });
+
+});
+</script>
+{% endif %}
+{% endblock script %}
+
+{% block body %}
+  
+<div class="container-fluid">
+
+  {% if current_Project %}
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Current Projects</h3>
+  
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-3">
+            <table id="project-table" class="table table-striped projects">
+                <thead>
+                    <tr>
+                        <th style="width: 1%">
+                            #
+                        </th>
+                        <th style="width: 15%">
+                            Project Name
+                        </th>
+                        <th style="width: 30%">
+                            Project Description
+                        </th>
+                        <th style="width: 30%">
+                          Project Progress
+                      </th>
+                        <th style="width: 10%">
+                            Assigned By
+                        </th>
+                        <th style="width: 20%">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in current_Project %}
+                    <tr>
+                        <td>
+                            {{forloop.counter}}
+                        </td>
+                        <td>
+                            <a id="Main-Project-Name{{project.id}}">
+                                {{project.project_name|truncatechars:20}}
+                            </a>
+                            <br/>
+                            <small>
+                                Updated {{project.updated_at|naturaltime}}
+                            </small>
+                        </td>
+                        <td>
+                            <a>
+                                {{project.project_description|truncatechars:100}}
+                            </a>
+                        </td>
+                        <td class="project_progress">
+                          <div class="progress progress-sm">
+                              <div class="progress-bar bg-green" role="progressbar" aria-valuenow="{{project.project_progress}}" aria-valuemin="0" aria-valuemax="100" style="width:{{project.project_progress}}%">
+                              </div>
+                          </div>
+                          <small>
+                            {{project.project_progress}}% Complete
+                          </small>
+                      </td>
+                        <td class="project_progress">
+                            <a>{{project.assigned_by|truncatechars:20}}</a>
+                        </td>
+                        <td class="project-actions text-right">
+                            <button type="button" data-toggle="modal" data-target="#Project-track-show-model" class="btn btn-primary btn-sm showMYClass" value="{{project.id}}">
+                                <i class="fas fa-folder">
+                                </i>
+                                Project Track
+                            </button>
+
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+  
+      </section>
+
+      <div class="modal fade" id="Project-track-show-model">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title col-11 text-center" id="ProjectName-show">None</h4>
+            </div>
+            <div class="modal-body">
+                
+                <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Track</h3>
+            
+                      <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="card-body p-3">
+                      <table id="project-table-track" class="table table-striped projects project-table-track">
+                          <thead>
+                              <tr>
+                                  <th style="width: 1%">
+                                      #
+                                  </th>
+                                  <th style="width: 20%">
+                                    Track Status
+                                  </th>
+                                  <th style="width: 50%">
+                                    Track Description
+                                  </th>
+                                  <th style="width: 8%">
+                                    Project Progress
+                                  </th>
+                                  <th style="width: 20%">
+                                      Date
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody id="project-track-table-id">
+                              
+                          </tbody>
+                      </table>
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+  {% else %}
+  <p>No project found</p>
+  {% endif %}
+
+</div>
+
+{% endblock body %}

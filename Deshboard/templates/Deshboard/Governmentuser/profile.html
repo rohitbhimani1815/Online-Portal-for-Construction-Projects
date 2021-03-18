@@ -1,0 +1,188 @@
+{% extends './government.html' %}
+
+
+{% block body %}
+
+<div class="container-fluid">
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3">
+
+            <!-- Profile Image -->
+            <div class="card card-primary card-outline">
+              <div class="card-body box-profile">
+                <div class="text-center">
+                  <img class="profile-user-img img-fluid img-circle"
+                       src="{{request.user.govermentuserprofile.profile_pic.url}}"
+                       alt="User profile picture">
+                </div>
+
+                <h3 class="profile-username text-center">{{request.user.get_username}}</h3>
+
+                <p class="text-muted text-center">{{request.user.govermentuserprofile.job_role}}</p>
+
+                <ul class="list-group list-group-unbordered mb-3">
+                  <li class="list-group-item">
+                    <b>Name :</b> <a class="float-right">{{request.user.get_full_name}}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Email :</b> <a  href="mailto:{{request.user.email}}" target="_blank" class="float-right">{{request.user.email}}</a>
+                  </li>
+                  <li class="list-group-item">
+                    <b>Date Join :</b> <a class="float-right">{{request.user.date_joined}}</a>
+                  </li>
+                </ul>
+
+                
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+
+            <!-- About Me Box -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">About Me</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <strong><i class="fas fa-book mr-1"></i> Education</strong>
+
+                <p class="text-muted">
+                  {{request.user.govermentuserprofile.education}}
+                </p>
+
+                <hr>
+
+                <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
+
+                <p class="text-muted">{{request.user.govermentuserprofile.location}}</p>
+
+                <hr>
+
+                <strong><i class="fas fa-pencil-alt mr-1"></i>Phone Number</strong>
+
+                <p class="text-muted">
+                  {{request.user.govermentuserprofile.phone}}
+                </p>
+
+                
+                <strong><i class="far fa-file-alt mr-1"></i> Experience</strong>
+
+                <p class="text-muted">{{request.user.govermentuserprofile.experiance}}</p>
+
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+          <div class="col-md-9">
+            <div class="card">
+              <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                  <li class="nav-item"><a class="nav-link active" href="#settings" data-toggle="tab">Settings</a></li>
+                </ul>
+              </div><!-- /.card-header -->
+              <div class="card-body">
+                <div class="tab-content">
+                  
+                  <!-- /.tab-pane -->
+                  <div class="active tab-pane" id="settings">
+                    {% include "../message.html" %}
+                    <form class="form-horizontal" method="POST" enctype="multipart/form-data">{% csrf_token %}
+                      <div class="form-group row">
+                        <label for="id_first_name" class="col-sm-2 col-form-label">First Name</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="first_name" id="id_first_name" value="{{form.first_name.value}}" placeholder="First Name" required>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_last_name" class="col-sm-2 col-form-label">Last Name</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="last_name" id="id_last_name" value="{{form.last_name.value}}" placeholder="Last Name" required>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_username" class="col-sm-2 col-form-label">User Name</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="username" id="id_username" value="{{form.username.value}}" placeholder="User Name" autofocus required>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_goverment_id" class="col-sm-2 col-form-label">Goverment id</label>
+                        <div class="col-sm-10">
+                          <input type="number" class="form-control" name="goverment_id" id="id_goverment_id" value="{{profileForm.goverment_id.value}}" placeholder="Goverment id" required="">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_job_role" class="col-sm-2 col-form-label">Job role</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="job_role" id="id_job_role" value="{{profileForm.job_role.value}}" maxlength="200" placeholder="Job role" required="">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_education" class="col-sm-2 col-form-label">Education</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="education" id="id_education" value="{{profileForm.education.value}}" placeholder="Education">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_location" class="col-sm-2 col-form-label">Location</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="location" id="id_location" value="{{profileForm.location.value}}" placeholder="Location">
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_email" class="col-sm-2 col-form-label">Email</label>
+                        <div class="col-sm-10">
+                          <input type="email" class="form-control" name="email" id="id_email" value="{{form.email.value}}" placeholder="Email" required >
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_phone" class="col-sm-2 col-form-label">Contact number</label>
+                        <div class="col-sm-10">
+                          <input type="tel" id="id_phone" maxlength="128" name="phone" class="form-control" value="{{profileForm.phone.value}}" placeholder="Contact Number" required>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_experiance" class="col-sm-2 col-form-label">Experience</label>
+                        <div class="col-sm-10">
+                          <textarea class="form-control" name="experiance" id="id_experiance" placeholder="Experience">{{profileForm.experiance.value}}</textarea>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="id_profile_pic" class="col-sm-2 col-form-label">Profile pic:</label>
+                        <div class="col-sm-10">
+                          {{profileForm.profile_pic}}
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="offset-sm-2 col-sm-10">
+                          <button type="submit" class="btn btn-danger">Submit</button>
+                        </div>
+                      </div>
+                      <!-- {{profileForm}} -->
+                      {% include "../error.html" %}
+                    </form>
+                  </div>
+                  <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+              </div><!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+
+</div>
+
+{% endblock %}

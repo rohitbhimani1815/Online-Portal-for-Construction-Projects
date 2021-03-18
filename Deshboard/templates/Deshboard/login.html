@@ -1,0 +1,46 @@
+{% extends "./loginreset.html" %}
+
+{% block title %}
+    
+<title>Log in</title>
+{% endblock title %}
+
+{% block bodyform %}
+
+<div class="card-body login-card-body">
+  <p class="login-box-msg">Sign in to start your session</p>
+  {% include "./message.html" %}
+  <form  method="post" class="form-validate">{% csrf_token %}
+    <div class="input-group mb-3">
+      <input type="email" id="username" name="username" required class="form-control" placeholder="Email">
+      <div class="input-group-append">
+        <div class="input-group-text">
+          <span class="fas fa-envelope"></span>
+        </div>
+      </div>
+    </div>
+    <div class="input-group mb-3">
+      <input type="password" id="password" name="password" required class="form-control" placeholder="Password">
+      <div class="input-group-append">
+        <div class="input-group-text">
+          <span class="fas fa-lock"></span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      
+      <!-- /.col -->
+      <div class="col-4">
+        <button type="submit" value="Login" class="btn btn-primary btn-block center">Sign In</button>
+      </div>
+      <!-- /.col -->
+    </div>
+  </form>
+
+
+  <p class="mb-1">
+    <a href="{% url 'reset_password' %}">Forgot my password</a>
+  </p>
+</div>
+  
+{% endblock bodyform %}

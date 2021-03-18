@@ -1,0 +1,167 @@
+{% extends "./superuser.html" %}
+{% load static %}
+
+{% block projectopen %}
+menu-open
+{% endblock projectopen %}
+
+{% block CreateProjectActive %}
+active
+{% endblock CreateProjectActive %}
+
+{% block projectactive %}
+active
+{% endblock projectactive %}
+
+{% block style %}
+
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'Deshboard/plugins/select2/css/select2.min.css' %}">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'Deshboard/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+
+{% endblock style %}
+
+{% block script %}
+
+<!-- Select2 -->
+<script src="{% static 'Deshboard/plugins/select2/js/select2.full.min.js' %}"></script>
+
+<!-- moment.js -->
+<script src="{% static 'Deshboard/plugins/moment/moment.min.js' %}"></script>
+
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="{% static 'Deshboard/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+<script>
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2()
+    $('#datetimepicker1').datetimepicker({
+      icons: { time: "fa fa-clock", },
+      format: 'MM/DD/YYYY HH:mm',
+    });
+        $('#datetimepicker2').datetimepicker({
+          useCurrent: false,
+          icons: { time: "fa fa-clock", },
+          format: 'MM/DD/YYYY HH:mm',
+        });
+        $("#datetimepicker1").on("change.datetimepicker", function (e) {
+            $('#datetimepicker2').datetimepicker('minDate', e.date);
+        });
+        $("#datetimepicker2").on("change.datetimepicker", function (e) {
+            $('#datetimepicker1').datetimepicker('maxDate', e.date);
+        });
+  })
+</script>
+
+{% endblock script %}
+
+{% block body %}
+  
+<div class="container-fluid">
+
+  <section class="content">
+    <form method="post" class="form-validate">{% csrf_token %}
+      {% include "../message.html" %}
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">General</h3>
+
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="card-body">
+            <div class="form-group">
+              <label for="id_project_name">Project Name</label>
+              <input type="text" name="project_name" id="id_project_name" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="id_project_description">Project Description</label>
+              <textarea id="id_project_description" name="project_description" class="form-control" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="inputStatus">Status</label>
+              <select id="id_status" name="status" class="form-control custom-select">
+                <option selected disabled>Select one</option>
+                <option value="pending" selected="">Pending</option>
+                <option value="assigned">Assigned</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+              <div class="form-group">
+                <label>Forms</label>
+                <div class="select2-success">
+                <select class="select2" name="forms" id="id_forms" required multiple="multiple" data-placeholder="Select a State" style="width: 100%;">
+                  {% for i in all_form_name %}
+                  <option value="{{i.id}}">{{i.form_name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              </div>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+      </div>
+      <div class="col-md-6">
+        <div class="card card-secondary">
+          <div class="card-header">
+            <h3 class="card-title">Budget</h3>
+
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="inputEstimatedBudget">Estimated budget</label>
+              <input type="text" name="estimated_budget" maxlength="30" id="id_estimated_budget" required class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="inputEstimatedDuration">Estimated project duration</label>
+              <input type="text" name="estimated_project_duration" maxlength="15" id="id_estimated_project_duration" required class="form-control">
+            </div>
+              <div class="form-group">
+                <label for="id_apply_start_date">Apply Start Date</label>
+                 <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                      <input type="text" name="apply_start_date" required id="id_apply_start_date" class="form-control datetimepicker-input" data-target="#datetimepicker1"/>
+                      <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                          <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                      </div>
+                  </div>
+              </div>
+              <div class="form-group">
+                <label for="id_apply_end_date">Apply End Date</label>
+                 <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+                      <input type="text" name="apply_end_date" id="id_apply_end_date" required class="form-control datetimepicker-input" data-target="#datetimepicker2"/>
+                      <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                          <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+      </div>
+    </div>
+    {% include "../error.html/" %}
+    <div class="row">
+      <div class="col-7 mb-3">
+        <input type="submit" value="Create new Porject" class="btn btn-success float-right">
+      </div>
+    </div>
+  </form>
+  </section>
+
+</div>
+
+{% endblock %}

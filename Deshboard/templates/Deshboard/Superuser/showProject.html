@@ -1,0 +1,584 @@
+{% extends user %}
+{% load static %}
+{% load humanize  %}
+
+{% block projectopen %}
+menu-open
+{% endblock projectopen %}
+
+{% block ShowProjectActive %}
+active
+{% endblock ShowProjectActive %}
+
+{% block projectactive %}
+active
+{% endblock projectactive %}
+
+{% block style %}
+
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'Deshboard/plugins/select2/css/select2.min.css' %}">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'Deshboard/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+
+      <!-- DataTables -->
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+
+{% endblock style %}
+
+{% block script %}
+
+
+<!-- DataTables  & Plugins -->
+<script src="{% static 'Deshboard/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Select2 -->
+<script src="{% static 'Deshboard/plugins/select2/js/select2.full.min.js' %}"></script>
+
+<!-- moment.js -->
+<script src="{% static 'Deshboard/plugins/moment/moment.min.js' %}"></script>
+
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="{% static 'Deshboard/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+  // function for View Project
+    $(".viewMYClass").click(function() {
+        var pid =  $(this).val();
+
+        $.ajax({
+
+            url:"{% url 'ShowProjectDetail' 1 %}".replace('/1',"/"+pid),
+            type:'GET',
+        })
+        .done(function(response){
+          if (response == "You are not authorized to view this page"){
+            $('#id-model-main-row').html("<p>You are not authorized to view this page</p>")
+          }
+          else{
+            var json_data=JSON.parse(response)[0];
+            $("#ProjectName").text("Project "+json_data['project_name'])
+            $("#Estimatedbudget").text(json_data['estimated_budget'])
+            $("#project-status").text(json_data['status'])
+            $("#Estimated-project-duration").text(json_data['estimated_project_duration'])
+            $("#project-Details").text(json_data['project_description'])
+            if(json_data['assigned_by']== null){
+
+                $("#Assigne-By").text("Project Not Assigne");
+            }
+            else{
+
+                $("#Assigne-By").text(json_data['assigned_by']);
+            }
+            if(json_data['assigned_to']== null){
+
+                $("#Project-Assigne-To").text("Project Not Assigne");
+            }
+            else{
+
+                $("#Project-Assigne-To").text(json_data['assigned_to']);
+            }
+            $("#Project-Apply-Start-Date").text(json_data['apply_start_date'])
+            $("#Project-Apply-End-Date").text(json_data['apply_end_date'])
+            $("#project-forms").text(json_data['Forms'])
+            $("#Project-Created-Date").text(json_data['created_at'])
+            $("#Project-Updated-Date").text(json_data['updated_at'])
+
+          }
+        })
+        .fail(function(){
+            $('#id-model-main-row').html("<p>There is a Error For Loading Project. Please try again Later.</p>")
+        })
+    });
+
+    // function For DataTable
+    $('#project-table').DataTable({
+      "scrollX": true,
+      "paging": true,
+      // "lengthChange": true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      // "responsive": true,
+      "scrollY": true,
+    });
+
+
+    // funcetion For Edit Project
+    $(".editMYClass").click(function() {
+
+          //Initialize Select2 Elements
+    $('.select2').select2()
+    $('#datetimepicker1').datetimepicker({
+      icons: { time: "fa fa-clock", },
+      format: 'MM/DD/YYYY HH:mm',
+    });
+        $('#datetimepicker2').datetimepicker({
+          useCurrent: false,
+          icons: { time: "fa fa-clock", },
+          format: 'MM/DD/YYYY HH:mm',
+        });
+        $("#datetimepicker1").on("change.datetimepicker", function (e) {
+            $('#datetimepicker2').datetimepicker('minDate', e.date);
+        });
+        $("#datetimepicker2").on("change.datetimepicker", function (e) {
+            $('#datetimepicker1').datetimepicker('maxDate', e.date);
+        });
+
+
+        var pid =  $(this).val();
+
+        $.ajax({
+
+            url:"{% url 'editProjectDetail' 1 %}".replace('/1',"/"+pid),
+            type:'GET',
+        })
+        .done(function(response){
+          if (response == "You are not authorized to view this page"){
+            $('#id-model-main-row-Edit').html("<p>You are not authorized to view this page</p>")
+          }
+          else{
+            var json_data=JSON.parse(response)[0]
+            $("#id_project_name").val(json_data['project_name']);
+            $("#ProjectNameEdit").text("Project "+json_data['project_name']);
+            $("#id_project_description").val(json_data['project_description']);
+            $("#id_estimated_budget").val(json_data['estimated_budget']);
+            $("#id_estimated_project_duration").val(json_data['estimated_project_duration']);
+            $("#id_apply_start_date").val(json_data['apply_start_date']);
+            $("#id_apply_end_date").val(json_data['apply_end_date']);
+            form_data = json_data['forms'];
+            form_option_str="";
+            for (name in form_data ){
+              if (form_data[name][1]=="selected"){
+                form_option_str = form_option_str + `<option value="`+form_data[name][0]+`" selected>`+name+`</option>`
+              }
+              else{
+              form_option_str = form_option_str + `<option value="`+form_data[name][0]+`">`+name+`</option>`
+              }
+            }
+            $("#id_forms").html(form_option_str);
+            $("#Update-Porject-btn").val(pid);
+            $("#id_status [value='"+json_data['status']+"']").attr('selected', 'true');
+          }
+        })
+        .fail(function(){
+          $('#id-model-main-row-Edit').html("<p>There is a Error For Loading Project. Please try again Later.</p>")
+        })
+    });
+
+    //function for post request for Edit Project
+    $("#Edit-form").submit(function(e){
+    e.preventDefault();
+    var pid=$("#Update-Porject-btn").val()
+    $.ajax({
+      url:"{% url 'editProjectDetail' 1 %}".replace('/1',"/"+pid),
+      type:'POST',
+      data: $(this).serialize(),
+      context: this,
+    })
+    .done(function(response){
+      if (response == "You are not authorized to view this page"){
+            $('#id-model-main-row-Edit').html("<p>You are not authorized to view this page</p>")
+          }
+          else{
+            location.reload();
+          }
+    })
+    .fail(function(){
+      $('#id-model-main-row-Edit').html("<p>There is a Error For Updated Project. Please try again Later.</p>")
+    })
+  });
+
+  // function for delete projects
+    $(".deleteMYClass").click(function(){
+      var pid =  $(this).val();
+      $("#project-title-delete").text($("#Main-Project-Name"+pid).text().trim());
+      $("#delete-project-btn").val(pid);
+    });
+    
+    // function for post request for delete projects
+    $("#delete-form").submit(function(e) {
+      e.preventDefault();
+      var pid =  $("#delete-project-btn").val();
+
+      $.ajax({
+      url:"{% url 'deleteProject' 1 %}".replace('/1',"/"+pid),
+      type:'POST',
+      data: $(this).serialize(),
+      context: this,
+    })
+    .done(function(response){
+      if (response == "You are not authorized to view this page"){
+            $('#id-model-main-row-Edit').html("<p>You are not authorized to view this page</p>")
+          }
+          else{
+            var json_response =JSON.parse(response)
+            if (json_response == "ProjectDeleteError"){
+              $('#delete-project-Warning-text').html("<p>There is a Error For Delete Project. Please try again Later.</p>");
+            }
+            else {
+              location.reload();
+            }
+          }
+        })
+    .fail(function(){
+      $('#delete-project-Warning-text').html("<p>There is a Error For Delete Project. Please try again Later.</p>")
+    })
+      
+    })
+})
+
+</script>
+
+{% endblock script %}
+
+{% block body %}
+  
+<div class="container-fluid">
+
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="card">
+          {% include "../message.html" %}
+          <div class="card-header">
+            <h3 class="card-title">Projects</h3>
+  
+            <div class="card-tools">
+              <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-3">
+            <table id="project-table" class="table table-striped projects">
+                <thead>
+                    <tr>
+                        <th style="width: 1%">
+                            #
+                        </th>
+                        <th style="width: 15%">
+                            Project Name
+                        </th>
+                        <th style="width: 30%">
+                            Project Description
+                        </th>
+                        <th style="width: 10%">
+                            Assigned By
+                        </th>
+                        <th style="width: 10%">
+                            Assigned To
+                        </th>
+                        <th style="width: 8%" class="text-center">
+                            Status
+                        </th>
+                        <th style="width: 20%" class="align-center">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in all_projects %}
+                    <tr>
+                        <td>
+                            {{forloop.counter}}
+                        </td>
+                        <td>
+                            <a id="Main-Project-Name{{project.id}}">
+                                {{project.project_name|truncatechars:20}}
+                            </a>
+                            <br/>
+                            <small>
+                                Updated {{project.updated_at|naturaltime}}
+                            </small>
+                        </td>
+                        <td>
+                            <a>
+                                {{project.project_description|truncatechars:75}}
+                            </a>
+                        </td>
+                        <td class="project_progress">
+                            <a>{{project.assigned_by|truncatechars:20}}</a>
+                        </td>
+                        <td>
+                            <a>
+                                {{project.assigned_to|truncatechars:20}}
+                            </a>
+                        </td>
+                        <td class="project-state">
+                            {% if project.status == 'pending' %}
+                            <span class="badge badge-warning">Pending</span>
+                            {% elif project.status == 'assigned' %}
+                            <span class="badge badge-primary">Assigned</span>
+                            {% elif project.status == 'completed' %}
+                            <span class="badge badge-success">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td class="project-actions text-right">
+                            <button type="button" data-toggle="modal" data-target="#Project-detail-show-model" class="btn btn-primary btn-sm viewMYClass mx-auto" value="{{project.id}}">
+                                <i class="fas fa-folder">
+                                </i>
+                                View
+                            </button>
+                            {% if request.user.user_type == '1' %}
+                            <button type="button" data-toggle="modal" data-target="#Project-detail-Edit-model" class="btn btn-info btn-sm editMYClass" value="{{project.id}}">
+                                <i class="fas fa-pencil-alt">
+                                </i>
+                                Edit
+                            </button>
+                            <button type="button" data-toggle="modal" data-target="#Project-detail-Delete-model" class="btn btn-danger btn-sm deleteMYClass" value="{{project.id}}">
+                              <i class="fas fa-trash">
+                              </i>
+                              Delete
+                          </button>
+                          {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+          </div>
+          <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+  
+      </section>
+     
+      <div class="modal fade" id="Project-detail-show-model">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title col-11 text-center text-break" id="ProjectName">None</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="id-model-main-row">
+                    <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
+                      <div class="row">
+                        <div class="col-12 col-sm-4">
+                          <div class="info-box bg-light">
+                            <div class="info-box-content">
+                              <span class="info-box-text text-center text-muted">Estimated budget</span>
+                              <span class="info-box-number text-center text-muted mb-0" id="Estimatedbudget" >000</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                          <div class="info-box bg-light">
+                            <div class="info-box-content">
+                              <span class="info-box-text text-center text-muted">Project Status</span>
+                              <span class="info-box-number text-center text-muted mb-0" id="project-status">None</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                          <div class="info-box bg-light">
+                            <div class="info-box-content">
+                              <span class="info-box-text text-center text-muted">Estimated project duration</span>
+                              <span class="info-box-number text-center text-muted mb-0" id="Estimated-project-duration">000</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div>
+                        <h3 class="text-primary d-block">Project Details</h3>
+                        <p class="text-muted text-break" id="project-Details">None</p>
+                        <h3 class="text-primary d-block">Project Assigne By</h3>
+                        <p class="text-muted text-break" id="Assigne-By">None</p>
+                        <h3 class="text-primary d-block">Project Assigne To</h3>
+                        <p class="text-muted text-break" id="Project-Assigne-To">None</p>
+                    </div>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2">
+                        <div class="text-muted">
+                        <h6 class="text-sm">Project Forms</h6>
+                        <b  id="project-forms">None</b>
+                    </div>
+                        <br>
+                        <div class="text-muted">
+                            <p class="text-sm">Project Apply Start Date
+                              <b class="d-block" id="Project-Apply-Start-Date">None</b>
+                            </p>
+                            <p class="text-sm">Project Apply End Date
+                              <b class="d-block" id="Project-Apply-End-Date">None</b>
+                            </p>
+                          </div>
+                        <div class="text-muted">
+                            <p class="text-sm">Project Created Date
+                              <b class="d-block" id="Project-Created-Date">None</b>
+                            </p>
+                            <p class="text-sm">Project Updated Date
+                              <b class="d-block" id="Project-Updated-Date">None</b>
+                            </p>
+                          </div>
+                      </div>
+                  </div>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+
+      {% if request.user.user_type == '1' %}
+      <div class="modal fade" id="Project-detail-Edit-model">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title col-11 text-center text-break" id="ProjectNameEdit">None</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <section class="content" id="id-model-main-row-Edit">
+                    <form method="post" id="Edit-form" class="form-validate">{% csrf_token %}
+                    <div class="row" id="editForm">
+                      <div class="col-md-6">
+                        <div class="card card-primary">
+                          <div class="card-header">
+                            <h3 class="card-title">General</h3>
+                
+                            <div class="card-tools">
+                              <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                              </button>
+                            </div>
+                          </div>
+                          
+                          <div class="card-body">
+                            <div class="form-group">
+                              <label for="id_project_name">Project Name</label>
+                              <input type="text" name="project_name" id="id_project_name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                              <label for="id_project_description">Project Description</label>
+                              <textarea id="id_project_description" name="project_description" class="form-control" rows="4" required></textarea>
+                            </div>
+                            <div class="form-group">
+                              <label for="id_status">Status</label>
+                              <select id="id_status" name="status" class="form-control custom-select">
+                                <option selected disabled>Select one</option>
+                                <option value="pending">Pending</option>
+                                <option value="assigned">Assigned</option>
+                                <option value="completed">Completed</option>
+                              </select>
+                            </div>
+                              <div class="form-group">
+                                <label>Forms</label>
+                                <div class="select2-success">
+                                <select class="select2" name="forms" id="id_forms" required multiple="multiple" data-placeholder="Select a State" style="width: 100%;">
+                                </select>
+                              </div>
+                              </div>
+                          </div>
+                          <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                      </div>
+                      <div class="col-md-6">
+                        <div class="card card-secondary">
+                          <div class="card-header">
+                            <h3 class="card-title">Budget</h3>
+                
+                            <div class="card-tools">
+                              <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                                <i class="fas fa-minus"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="card-body">
+                            <div class="form-group">
+                              <label for="inputEstimatedBudget">Estimated budget</label>
+                              <input type="text" name="estimated_budget" maxlength="30" id="id_estimated_budget" required class="form-control">
+                            </div>
+                            <div class="form-group">
+                              <label for="inputEstimatedDuration">Estimated project duration</label>
+                              <input type="text" name="estimated_project_duration" maxlength="15" id="id_estimated_project_duration" required class="form-control">
+                            </div>
+                              <div class="form-group">
+                                <label for="id_apply_start_date">Apply Start Date</label>
+                                 <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                                      <input type="text" name="apply_start_date" required id="id_apply_start_date" class="form-control datetimepicker-input" data-target="#datetimepicker1"/>
+                                      <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                                          <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="form-group">
+                                <label for="id_apply_end_date">Apply End Date</label>
+                                 <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+                                      <input type="text" name="apply_end_date" id="id_apply_end_date" required class="form-control datetimepicker-input" data-target="#datetimepicker2"/>
+                                      <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                                          <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-7 mb-3">
+                        <button type="submit" id="Update-Porject-btn" class="btn btn-success float-right">
+                          Update Porject
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                  </section>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+
+      <div class="modal fade" id="Project-detail-Delete-model">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 id="project-title-delete" class="modal-title">None</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p id="delete-project-Warning-text">Are you sure you want to delete this project?</p>
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <form method="post" id="delete-form" class="form-validate">{% csrf_token %}
+              <button type="submit" class="btn btn-danger" id="delete-project-btn">Delete Project</button>
+              </form>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      {% endif %}
+
+</div>
+
+{% endblock %}

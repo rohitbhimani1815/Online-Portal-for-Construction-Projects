@@ -1,0 +1,478 @@
+{% extends user %}
+
+{% load static %}
+
+
+{% block appliedprojectactive %}
+active
+{% endblock appliedprojectactive %}
+
+{% block appliedprojectopen %}
+menu-open
+{% endblock appliedprojectopen %}
+
+{% block ApplideProjectListActive %}
+active
+{% endblock ApplideProjectListActive %}
+
+{% block style %}
+{% if detail %}
+  <!-- Select2 -->
+  <link rel="stylesheet" href="{% static 'Deshboard/plugins/select2/css/select2.min.css' %}">
+  <!-- Tempusdominus Bootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'Deshboard/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+
+      <!-- DataTables -->
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+      <link rel="stylesheet" href="{% static 'Deshboard/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+{% endif %}
+{% endblock style %}
+
+
+{% block script %}
+{% if detail %}
+
+<!-- DataTables  & Plugins -->
+<script src="{% static 'Deshboard/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'Deshboard/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+
+<!-- Select2 -->
+<script src="{% static 'Deshboard/plugins/select2/js/select2.full.min.js' %}"></script>
+
+<!-- moment.js -->
+<script src="{% static 'Deshboard/plugins/moment/moment.min.js' %}"></script>
+
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="{% static 'Deshboard/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+
+  $('.viewMYClass').click(function() {
+
+var pid =  $(this).val();
+$("#User-name-Profile").text($("#Main-User-Name"+pid).text().trim());
+
+$.ajax({
+url:"{% url 'OrganizationProfileShow' 1 %}".replace('/1',"/"+pid),
+type:'GET',
+})
+.done(function(response){
+var json_response =JSON.parse(response)
+if (json_response == "You are not authorized to view this page"){
+    $('#id-model-main-row-Profile').html("<p>You are not authorized to view this page</p>")
+  }
+  else{
+    if (json_response == "Error"){
+      $('#id-model-main-row-Profile').html("<p>There is a Error in show Profile. Please try again Later.</p>");
+    }
+    else {
+      $('#user_img_id').attr("src",json_response[0]['user_img'])
+      $('#username_id').text(json_response[0]['username'])
+      $('#Organization_name_id').text(json_response[0]['Organization_name'])
+      $('#full_name_id').text(json_response[0]['full_name'])
+      $('#email_id').text(json_response[0]['email'])
+      $('#email_id').attr('href',"mailto:"+json_response[0]['email'])
+      $('#date_joined_id').text(json_response[0]['date_joined'])
+      $('#total_project_id').text(json_response[0]['total_project'])
+      $('#location_id').text(json_response[0]['location'])
+      $('#phone_id').text(json_response[0]['phone'])
+      $('#experiance_id').text(json_response[0]['experiance'])
+
+      past_project_text=``
+      for(i in json_response[1]){
+          past_project_text += `
+        
+          <div class="card card-primary">
+                          <div class="card-header">
+                            <h4 class="card-title w-100">
+                              <a class="d-block w-100" data-toggle="collapse" href="#projectid`+json_response[1][i].id+`">
+                                <div>
+                                  <div>
+                                    <b>Projct Name</b> :
+                                    `+json_response[1][i].project_name+` 
+                                  </div>
+                                </div>
+                              </a>
+                            </h4>
+                          </div>
+                          <div id="projectid`+json_response[1][i].id+`" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                              <div>
+                                <div>
+                                  <b>Projct Description</b> :
+                                  `+json_response[1][i].project_description+` 
+                                </div>
+                                <div>
+                                  <b>Estimated Budget</b> :
+                                  `+json_response[1][i].estimated_budget+` 
+                                </div>
+                                <div>
+                                  <b>Estimated Project Duration</b> :
+                                  `+json_response[1][i].estimated_project_duration+` 
+                                </div>
+                                <div>
+                                  <b>Project Complete detail</b> :
+                                  `+json_response[1][i].Complete_details+` 
+                                </div>
+                                <div>
+                                  <b>Project complete Rating</b> :
+                                  `+json_response[1][i].complete_Rating+" /5.0"+` 
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+          
+          
+          `
+      }
+
+
+      $('#accordion').html(past_project_text)
+    }
+  }
+})
+.fail(function(){
+$('#id-model-main-row-Profile').html("<p>There is a Error in show Profile. Please try again Later.</p>")
+})
+
+})
+
+
+
+    $(".AssignProjectMYClass").click(function() {
+        var pid = $(this).val();
+        $.ajax({
+            url:"{% url 'assignProject' 1 %}".replace('/1',"/"+pid),
+            type:'GET',
+        })
+        .done(function(response){
+            var json_data=JSON.parse(response);
+            if (json_response == "You are not authorized to view this page"){
+              $('#id-model-main-row-Assign').html("<p>You are not authorized to view this page</p>")
+            }
+            else{
+            $('#ProjectName').text(json_data['project_name']);
+            $('#Assign_description').val("");
+            $("#error-display").text("")
+            $('#assign-project-btn').val(pid);
+            var select_str=`<option selected disabled>Select one</option>`;
+            org_data = json_data['applied_org'];
+            for(org_id in org_data)
+            {
+                select_str+=`<option value="${org_data[org_id][0]}">${org_data[org_id][1]}</option>`;
+            }
+            $("#id_select_org").html(select_str);
+          }
+        })
+        .fail(function(){
+            $('#id-model-main-row-Assign').html("<p>There is Error. Please Try Again Later</p>");
+        })
+    })
+
+    $("#assign-project-form").submit(function(e) {
+        e.preventDefault();
+        var pid = $('#assign-project-btn').val();
+
+        $.ajax({
+            url:"{% url 'assignProject' 1 %}".replace('/1',"/"+pid),
+            type:'POST',
+            data: $(this).serialize(),
+            context: this,
+        })
+        .done(function(response){
+            var json_data=JSON.parse(response);
+            if(json_data=="select Organization")
+            {
+            $("#error-display").text("select Organization")
+        }
+        else if(json_data=="OK"){
+            location.reload()
+        }
+        })
+        .fail(function(){
+            console.log("fail");
+        })
+
+    })
+} );
+
+    
+    </script>
+{% endif %}
+{% endblock script %}
+
+
+
+{% block body %}
+  
+<div class="container-fluid">
+
+  {% if detail %}
+  {% for i,data in detail.items %}
+  <section id="mysection{{i}}" class="content">
+    <div class="card collapsed-card">
+        <div class="card-header">
+          <h3 class="card-title">
+              <div>
+                  <div class="d-inline float-left mr-5"><b class="">Project Name :</b>  {{data.0.project.project_name|truncatechars:25}}</div>
+                  <div class="d-inline float-right ml-5"><b>Project Status :</b>
+                    <td class="">
+                        {% if data.0.project.status == 'pending' %}
+                        <span class="badge badge-warning">Pending</span>
+                        {% elif data.0.project.status == 'assigned' %}
+                        <span class="badge badge-primary">Assigned</span>
+                        {% elif data.0.project.status == 'completed' %}
+                        <span class="badge badge-success">Completed</span>
+                        {% endif %}
+                    </td>
+                </div>
+                  
+
+              </div>
+          </h3>
+  
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+              <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-3">
+        <table id="project-table" class="table table-striped projects">
+              <a type="button" href="{% url 'appliedProjectDetail' i %}" class="btn btn-success databtnClass">Show Detail</a>
+              {% if data.0.project.status == 'pending' %}
+              <button type="button" data-toggle="modal" data-target="#Apply-project-model" value="{{i}}" class="btn btn-success AssignProjectMYClass ml-3">Assign Project</button>
+              {% endif %}
+              <thead>
+                  <tr>
+                      <th style="width: 2%">
+                          #
+                      </th>
+                      <th style="">
+                          Apply user
+                      </th>
+                      <th style="">
+                          Apply Date
+                      </th>
+                      <th>
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for project in data %}
+                  <tr>
+                      <td>
+                          {{forloop.counter}}
+                      </td>
+                      <td>
+                          <a id="Main-User-Name{{project.user.id}}">
+                              {{project.user}}
+                          </a>
+                      </td>
+                      <td class="project-actions">
+                          {{project.date_applyed}}
+                      </td>
+                      <td class="project-actions text-right">
+                        <button type="button" data-toggle="modal" data-target="#User-Profile-model" class="btn btn-primary btn-sm viewMYClass" value="{{project.user.id}}">
+                          <i class="fas fa-user">
+                          </i>
+                          Show Profile
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  
+              </tbody>
+              <tfoot>
+                  <tr>
+                    <th style="width: 2%">
+                        #
+                    </th>
+                    <th style="">
+                        Apply user
+                    </th>
+                    <th style="">
+                        Apply Date
+                    </th>
+                    <th>
+                    </th>
+                  </tr>
+              </tfoot>
+          </table>
+        </div>
+        <!-- /.card-body -->
+      </div>
+  </section>
+  {% endfor %}
+  
+
+
+  <div class="modal fade" id="User-Profile-model">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 id="User-name-Profile" class="modal-title">None</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="id-model-main-row-Profile">
+            <div class="row">
+                <!-- Profile Image -->
+                <div class="col-md-4">
+                <div class="card card-primary card-outline">
+                  <div class="card-body box-profile">
+                    <div class="text-center">
+                      <img id="user_img_id" class="profile-user-img img-fluid img-circle"
+                           src=""
+                           alt="User profile picture">
+                    </div>
+    
+                    <h3 id="username_id" class="profile-username text-center"></h3>
+    
+                    <p id="Organization_name_id" class="text-muted text-center"></p>
+    
+                    <ul class="list-group list-group-unbordered mb-3">
+                      <li class="list-group-item">
+                        <b>Name :</b> <a class="float-right" id="full_name_id"></a>
+                      </li>
+                      <li class="list-group-item">
+                        <b>Email :</b> <a  href="" target="_blank" class="float-right" id="email_id"></a>
+                      </li>
+                      <li class="list-group-item">
+                        <b>Date Join :</b> <a class="float-right" id="date_joined_id"></a>
+                      </li>
+                    </ul>
+    
+                    
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+    
+                <!-- About Me Box -->
+                <div class="card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">About Me</h3>
+                  </div>
+                  <!-- /.card-header -->
+                  <div class="card-body">
+                    <strong><i class="fas fa-book mr-1"></i> Total Project</strong>
+    
+                    <p class="text-muted" id="total_project_id">
+                    </p>
+    
+                    <hr>
+    
+                    <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
+    
+                    <p class="text-muted" id="location_id"></p>
+    
+                    <hr>
+    
+                    <strong><i class="fas fa-pencil-alt mr-1"></i>Phone Number</strong>
+    
+                    <p class="text-muted" id="phone_id">
+                    </p>
+    
+                    
+                    <strong><i class="far fa-file-alt mr-1"></i> Experience</strong>
+    
+                    <p class="text-muted" id="experiance_id"></p>
+    
+                  </div>
+                  <!-- /.card-body -->
+                </div>
+                </div>
+                <!-- /.card -->
+                <div class="col-md-8">
+                  <div>
+                    <p>Past Project</p>
+                  </div>
+                
+                    <div id="accordion">
+                        
+                      </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <div class="modal fade" id="Apply-project-model">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title col-11 text-center" id="ProjectName">None</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id='id-model-main-row-Assign'>
+            <form method="post" id="assign-project-form" class="form-validate">{% csrf_token %}
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="card card-primary">
+                    <div class="card-header">
+                      <h3 class="card-title">Assign Project</h3>
+          
+                      <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="inputStatus">Assign To</label>
+                            <select id="id_select_org" name="select_org" required class="form-control custom-select">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                          <label for="Assign_description">Assign Description</label>
+                          <textarea id="Assign_description" name="Assign_description" class="form-control" rows="4" required></textarea>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+                  <!-- /.card -->
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-7 mb-3">
+                  <button type="submit" id="assign-project-btn" class="btn btn-success float-right" value="">Assign Project</button>
+                </div>
+              </div>
+              <div id="error-display"></div>
+            </form>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  {% else %}
+  <p>No Applied Project Found</p>
+  {% endif %}
+
+</div><!-- /.container-fluid -->
+
+{% endblock body %}
